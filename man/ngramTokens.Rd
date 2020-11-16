@@ -11,6 +11,7 @@ ngramTokens(
   language = "english",
   punct = TRUE,
   stop.words = TRUE,
+  number.words = TRUE,
   overlap = 1,
   sparse = 0.995,
   verbose = FALSE,
@@ -31,6 +32,8 @@ ngramTokens(
 
 \item{stop.words}{logical Should stop words be kept? Default is TRUE}
 
+\item{number.words}{logical Should numbers be kept as words? Default is TRUE}
+
 \item{overlap}{numeric Threshold (as cosine distance) for including ngrams that constitute other included phrases. Default is 1 (i.e. all ngrams included).}
 
 \item{sparse}{maximum feature sparsity for inclusion (1 = include all features)}
@@ -38,6 +41,8 @@ ngramTokens(
 \item{verbose}{logical Should the package report token counts after each ngram level? Useful for long-running code. Default is FALSE.}
 
 \item{vocabmatch}{matrix Should the new token count matrix will be coerced to include the same tokens as a previous count matrix? Default is NULL (i.e. no token match).}
+
+\item{num.mc.cores}{numeric number of cores for parallel processing - see parallel::detectCores(). Default is 1.}
 }
 \value{
 a matrix of feature counts
@@ -45,4 +50,12 @@ a matrix of feature counts
 \description{
 Tally bag-of-words ngram features
 }
-\keyword{internal}
+\details{
+This function produces ngram featurizations of text based on the quanteda package. This provides a complement to the doc2concrete function by demonstrating
+How to build a feature set for training a new detection algorithm in other contexts.
+}
+\examples{
+
+dim(ngramTokens(feedback_dat$feedback, ngrams=1))
+dim(ngramTokens(feedback_dat$feedback, ngrams=1:3))
+}
