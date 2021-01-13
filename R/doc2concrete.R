@@ -24,7 +24,7 @@ utils::globalVariables(c("mturk_list","bootstrap_list","adviceModel","adviceNgra
 #' However, we still encourage researchers to train a model of concreteness in their own domain, if possible.
 #'
 #' @references
-#' Yeomans, M. (2020). Concreteness, Concretely. Working Paper.
+#' Yeomans, M. (2021). A Concrete Application of Open Science for Natural Language Processing. Organizational Behavior and Human Decision Processes, 162, 81-94.
 #'
 #' Brysbaert, M., Warriner, A. B., & Kuperman, V. (2014). Concreteness ratings for 40 thousand generally known English word lemmas. Behavior Research Methods, 46(3), 904-911.
 #'
@@ -47,68 +47,58 @@ utils::globalVariables(c("mturk_list","bootstrap_list","adviceModel","adviceNgra
 
 doc2concrete<-function(texts,
                        domain=c("open","advice","plans"),
-                       wordlist=NULL,
+                       wordlist=doc2concrete::mturk_list,
                        stop.words=TRUE,
                        number.words=TRUE,
                        shrink=FALSE,
                        fill=FALSE,
                        uk_english=FALSE,
                        num.mc.cores=1){
-  texts<-iconv(textclean::replace_non_ascii(texts),to="ASCII",sub=" ")
+  texts<-iconv(cleanpunct(texts),to="ASCII",sub=" ")
   texts[is.na(texts) | stringr::str_count(texts, "[[:alpha:]]+")==0] <- " .  "
   if(uk_english){
     texts<-usWords(texts)
   }
-  if(domain[1]=="advice"){
-    bootC<-concDict(texts=texts,
-                    wordlist=doc2concrete::bootstrap_list,
-                    shrink=FALSE,
-                    stop.words=TRUE,
-                    number.words=TRUE,
-                    num.mc.cores=num.mc.cores)
-    brysC<-concDict(texts=texts,
-                    wordlist=doc2concrete::mturk_list,
-                    shrink=FALSE,
-                    stop.words=TRUE,
-                    number.words=TRUE,
-                    num.mc.cores=num.mc.cores)
-    testX<-as.matrix(cbind(ngramTokens(texts, ngrams=1:3, stop.words = TRUE,sparse=1,
-                                       vocabmatch = doc2concrete::adviceNgrams,
-                                       num.mc.cores=num.mc.cores),
-                           bootC,brysC))
-    conc<-stats::predict(doc2concrete::adviceModel, newx = testX,
-                         s="lambda.min", type="response")[,1]
-  } else if (domain[1]=="plans"){
-    bootC=concDict(texts=texts,
-                   wordlist=doc2concrete::bootstrap_list,
-                   shrink=FALSE,
-                   stop.words=TRUE,
-                   number.words=TRUE,
-                   num.mc.cores=num.mc.cores)
-    brysC=concDict(texts=texts,
-                   wordlist=doc2concrete::mturk_list,
-                   shrink=FALSE,
-                   stop.words=TRUE,
-                   number.words=TRUE,
-                   num.mc.cores=num.mc.cores)
-    testX<-as.matrix(cbind(ngramTokens(texts, ngrams=1:3,
-                                       stop.words = TRUE,number.words = TRUE,
-                                       sparse=1, vocabmatch = doc2concrete::planNgrams,
-                                       num.mc.cores=num.mc.cores),
-                           bootC,brysC))
-    conc<-stats::predict(doc2concrete::planModel, newx = testX,
-                         s="lambda.min", type="response")[,1]
-  } else {
-    if(is.null(wordlist)){
-      wordlist=doc2concrete::mturk_list
+  if(length(texts)<4000){
+    if(domain[1]=="advice"){
+      conc<-adviceModel(texts=texts,
+                        num.mc.cores=num.mc.cores)
+    } else if (domain[1]=="plans"){
+      conc<-planModel(texts=texts,
+                      num.mc.cores=num.mc.cores)
+    } else {
+      conc<-concDict(texts=texts,
+                     wordlist=wordlist,
+                     shrink=shrink,
+                     fill=fill,
+                     stop.words=stop.words,
+                     number.words=number.words,
+                     num.mc.cores=num.mc.cores)
     }
-    conc=concDict(texts=texts,
-                  wordlist=wordlist,
-                  shrink=shrink,
-                  fill=fill,
-                  stop.words=stop.words,
-                  number.words=number.words,
-                  num.mc.cores=num.mc.cores)
+  } else{
+    # Batched loop to minimize memory load
+    textList<-split(texts, ceiling(seq_along(texts)/2000))
+    concList<-lapply(1:length(textList),function(x) NA)
+    tpb<-utils::txtProgressBar(0,length(textList))
+    for (x in 1:length(textList)){
+      if(domain[1]=="advice"){
+        concList[[x]]<-adviceModel(texts=textList[[x]],
+                                   num.mc.cores=num.mc.cores)
+      } else if (domain[1]=="plans"){
+        concList[[x]]<-planModel(texts=textList[[x]],
+                                 num.mc.cores=num.mc.cores)
+      } else {
+        concList[[x]]<-concDict(texts=textList[[x]],
+                                wordlist=wordlist,
+                                shrink=shrink,
+                                fill=fill,
+                                stop.words=stop.words,
+                                number.words=number.words,
+                                num.mc.cores=num.mc.cores)
+      }
+      utils::setTxtProgressBar(tpb,x)
+    }
+    conc<-do.call(c,concList)
   }
   return(conc)
 }
