@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(comment = NA, message = FALSE, warning = FALSE)
 
 ## ----gh-installation, eval = FALSE--------------------------------------------
-#  devtools::install_github("myeomans/doc2concrete")
+#  install.packages("doc2concrete")
 
 ## ----eval=TRUE----------------------------------------------------------------
 

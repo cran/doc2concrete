@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2021-01-13" />
+<meta name="date" content="2021-04-25" />
 
 <title>doc2concrete</title>
 
@@ -328,7 +328,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">doc2concrete</h1>
 <h3 class="subtitle">Concreteness in Natural Language</h3>
-<h4 class="date">2021-01-13</h4>
+<h4 class="date">2021-04-25</h4>
 
 
 
@@ -338,11 +338,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>You can install the doc2concrete package directly, like so:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;myeomans/doc2concrete&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;doc2concrete&quot;</span>)</span></code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2>Usage</h2>
-<p>Here, we provide a single function, <code>doc2concrete</code>, that maps operationalize models of document-level concreteness based on a survey of datasets in several domains, including advice. This package is built as an accompaniment to Yeomans (2020), which reviews existing linguistic concreteness models across several domains. This function conducts two kinds of analyses, which can be selected using the <code>domain</code> argument.</p>
+<p>Here, we provide a single function, <code>doc2concrete</code>, that maps operationalize models of document-level concreteness based on a survey of datasets in several domains, including advice. This package is built as an accompaniment to Yeomans (2021), which reviews existing linguistic concreteness models across several domains. This function conducts two kinds of analyses, which can be selected using the <code>domain</code> argument.</p>
 <div id="domain-specific-pre-trained-concreteness-model" class="section level3">
 <h3>Domain-Specific Pre-Trained Concreteness Model</h3>
 <p>First, we provide pre-trained models specifically tuned to measure concreteness in two open-ended goal pursuit domains - advice and plan-making. These were developed using supervised machine learning tools, and robustly outperform other domain-specific models. We trained the advice model across a range of datasets from lab and field settings (9 studies, 4,608 participants), and we trained the plan-making model from plans students wrote at the beginning of online classes (7 classes, 5,172 students). Our package implements the best- performing supervised models - the LASSO model with bag-of-ngrams and dictionary features - to calculate concreteness in a new set of in-domain texts.</p>
@@ -385,13 +385,13 @@ sample estimates:
     Pearson&#39;s product-moment correlation
 
 data:  doc2concrete(feedback_dat$feedback, domain = &quot;advice&quot;) and feedback_dat$concrete
-t = 3.9949, df = 169, p-value = 9.644e-05
+t = 3.823, df = 169, p-value = 0.0001851
 alternative hypothesis: true correlation is not equal to 0
 95 percent confidence interval:
- 0.1502945 0.4250756
+ 0.1378945 0.4146450
 sample estimates:
       cor 
-0.2937416 </code></pre>
+0.2821285 </code></pre>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">doc2concrete</span>(<span class="kw">c</span>(<span class="st">&quot;Be more concrete&quot;</span>,<span class="st">&quot;Be more abstract&quot;</span>),</span>
 <span id="cb10-2"><a href="#cb10-2"></a>             <span class="dt">domain=</span><span class="st">&quot;advice&quot;</span>)</span></code></pre></div>
 <pre><code>       text1        text2 
@@ -409,7 +409,7 @@ sample estimates:
 <h2>References</h2>
 <p>Brysbaert, M., Warriner, A. B., &amp; Kuperman, V. (2014). Concreteness ratings for 40 thousand generally known English word lemmas. Behavior Research Methods, 46(3), 904-911.</p>
 <p>Blunden, H., Green, P., &amp; Gino, F. (2018). The Impersonal Touch: Improving Feedback- Giving with Interpersonal Distance. Academy of Management Proceedings, 2018(1).</p>
-<p>Yeomans, M. (2020). A Concrete Application of Open Science for Natural Language Processing. Working Paper.</p>
+<p>Yeomans, M. (2021). A concrete example of construct construction in natural language. Organizational Behavior and Human Decision Processes, 162, 81-94.</p>
 </div>
 </div>
 
