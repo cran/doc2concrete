@@ -131,7 +131,7 @@ stemmer<-function(text, wstem="all", language="english"){
     xes<-(strsplit(text, split=" ")[[1]])
     xes<-xes[which(nchar(xes)>0)]
     if(length(wstem)>1) xes<-sapply(xes, function(x) stemexcept(x, wstem, language), USE.NAMES=F)
-    if(wstem=="all") xes<-sapply(xes, SnowballC::wordStem, language=language, USE.NAMES=F)
+    if(wstem[1]=="all") xes<-sapply(xes, SnowballC::wordStem, language=language, USE.NAMES=F)
     return(xes)
   }
 }
@@ -198,9 +198,9 @@ overlaps<-function(high, low, cutoff=1,verbose=FALSE){
 #' @return Token count matrix with no doubled column names.
 #' @keywords internal
 doublestacker<-function (wdcts){
-  if(ncol(wdcts)>1){
-    wdcts<-as.matrix(wdcts)
-    words<- colnames(wdcts)
+  words<- colnames(wdcts)
+  if(sum(duplicated(words))>0){
+    #wdcts<-as.matrix(wdcts)
     for (Q in words[duplicated(words)]) {
       wdcts[, (words== Q) & (!duplicated(words))] <- as.numeric(rowSums(wdcts[,(words== Q)]))
       wdcts[, ((words== Q) & (duplicated(words)))] <- NA
@@ -219,15 +219,16 @@ doublestacker<-function (wdcts){
 #' @return Token counts matrix from new data, with column names that match the model data.
 #' @keywords internal
 vocabmatcher<-function(hole, peg){
-  peg<-doublestacker(as.matrix(peg))
+  peg<-doublestacker(peg)
   newpeg<-array(0, c(nrow(peg), ncol(hole)))
   for (i in 1:ncol(newpeg)){
     if(colnames(hole)[i] %in% colnames(peg)){
-      newpeg[,i]<-peg[,which(colnames(peg)==colnames(hole)[i])]
+      newpeg[,i]<-as.vector(peg[,which(colnames(peg)==colnames(hole)[i])])
     }
   }
   dimnames(newpeg)<-list(rownames(peg), colnames(hole))
-  return(as.matrix(newpeg))
+  newpeg<-quanteda::as.dfm(newpeg)
+  return(newpeg)
 }
 ############################################################################
 
@@ -253,9 +254,7 @@ cleanpunct<-function(text){
   # text<-gsub("’", "'", text)
   # text<-gsub("“", '"', text)
   # text<-gsub("”", '"', text)
-  text<-gsub("[\x84\x93\x94]", '"', text)
   text<-gsub("[\u201C\u201D\u201E\u201F\u2033\u2036]", '"', text)
-  text<-gsub("[\x82\x91\x92]", "'", text)
   text<-gsub("[\u2018\u2019\u201A\u201B\u2032\u2035]", "'", text)
   text<-stringi::stri_trans_general(text, "latin-ascii")
   return(text)
