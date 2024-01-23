@@ -16,7 +16,7 @@ doc2concrete(c("this is a brown rock.","this is a vague idea."),
              domain="open")
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 
 data("feedback_dat")
 
